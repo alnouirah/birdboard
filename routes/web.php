@@ -14,3 +14,8 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+Route::post('/projects',function(){
+    App\projects::create(request(['title','description']));
+});
