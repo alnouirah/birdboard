@@ -15,7 +15,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::post('/projects','ProjectsController@store')->middleware('auth');
 
-Route::post('/projects',function(){
-    App\projects::create(request(['title','description']));
-});
+Route::get('/projects','ProjectsController@index');
+
+Route::get('/projects/{project}','ProjectsController@show');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
