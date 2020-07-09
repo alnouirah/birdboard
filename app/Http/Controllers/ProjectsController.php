@@ -10,30 +10,50 @@ class ProjectsController extends Controller
 {
     public function index(){
 
-        $projects = Project::all();
+        $projects = auth()->user()->projects;
 
         return view('projects/index',compact('projects'));
 
     }
 
+    public function create(){
+        
+        return view('projects/create',['project' => new \App\Project]);
+
+    }
+
     public function show(){
         
-        $porject = Project::find(request('project'));
+        $project = Project::findOrFail(request('project'));
 
-        return view('projects/show',compact('porject'));
+        $this->authorize('update',$project);
+
+        return view('projects/show',compact('project'));
     }
 
     public function store(){
 
-        $attributes = request()->validate([
-                        'title'         => 'required',
-                        'description'   =>  'required',
-                    ]);
+        $project = auth()->user()->projects()->create($this->validateRequest());
 
+        return redirect($project->path());
 
-        auth()->user()->projects()->create($attributes);
+    }
 
-        return redirect('/projects');
+    public function update(Project $project){
+        $this->authorize('update',$project);
+        $project->update($this->validateRequest());
+        return redirect($project->path());
+    }
 
+    public function edit(Project $project){
+        return view('projects.edit',compact('project'));
+    }
+
+    private function validateRequest(){
+            return  request()->validate([
+                'title'         =>  'sometimes:required',
+                'description'   =>  'sometimes:required',
+                'notes'         =>  'nullable'
+        ]);
     }
 }
