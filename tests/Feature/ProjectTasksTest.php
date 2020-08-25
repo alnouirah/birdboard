@@ -44,23 +44,65 @@ class ProjectTasksTest extends TestCase
         
         $this->actingAs($project->owner)->patch($project->tasks->first()->path(),[
             'body'          =>  'newBody',
-            'compleated'    =>  true
+            'completed'    =>  true
         ]);
         
         $this->assertDatabaseHas('tasks',[
             'body'          =>  'newBody',
-            'compleated'    =>  true
+            'completed'    =>  true
+        ]);
+
+    }
+    
+    /** @test **/
+    public function a_tasks_can_be_completed() {
+        $project = ProjectFactory::withTasks(1)->create();
+        
+        $this->actingAs($project->owner)->patch($project->tasks->first()->path(),[
+            'body'          =>  'newBody',
+            'completed'    =>  true
+        ]);
+        
+        $this->assertDatabaseHas('tasks',[
+            'body'          =>  'newBody',
+            'completed'    =>  true
         ]);
 
     }
 
     /** @test **/
+    public function a_tasks_can_be_incompleted() {
+        $this->withoutExceptionHandling();
+        $project = ProjectFactory::withTasks(1)->create();
+        
+        $this->actingAs($project->owner)->patch($project->tasks->first()->path(),[
+            'body'          =>  'newBody',
+            'completed'    =>  true
+        ]);
+        
+        $this->assertDatabaseHas('tasks',[
+            'body'          =>  'newBody',
+            'completed'    =>  true
+        ]);
+
+        $this->actingAs($project->owner)->patch($project->tasks->first()->path(),[
+            'body'          =>  'newBody',
+            'completed'    =>  false
+        ]);
+
+        $this->assertDatabaseHas('tasks',[
+            'body'          =>  'newBody',
+            'completed'    =>  false
+        ]);
+    }
+
+    /** @test **/
     public function only_project_owner_can_update_a_task() {
         $project = ProjectFactory::withTasks(1)->create();
-        $this->patch($project->tasks->first()->path(),['body'=>'new body','compleated'=>true]);
+        $this->patch($project->tasks->first()->path(),['body'=>'new body','completed'=>true]);
         $this->assertDatabaseMissing('tasks',[
             'body'          =>  'new body',
-            'compleated'    =>  true,
+            'completed'    =>  true,
         ]);
     }
 }

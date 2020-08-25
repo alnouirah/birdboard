@@ -22,7 +22,7 @@ class ManageProjectsTests extends TestCase
         $this->get('/projects/create')->assertRedirect('login');
     }
 
-      /** @test **/    
+    /** @test **/    
     public function an_authenticated_user_cannot_view_projects_of_other() {
         $this->signIn();
         $project = factory('App\Project')->create();
@@ -46,6 +46,14 @@ class ManageProjectsTests extends TestCase
             ->assertSee($attributes['description'])
             ->assertSee($attributes['notes']);
     }
+
+    /** @test */
+    public function a_user_can_delete_project(){
+        $this->withoutExceptionHandling();
+        $project = ProjectFactory::create();
+        $this->actingAs($project->owner)->delete($project->path())->assertRedirect('/projects');
+        $this->assertDatabaseMissing('projects',$project->only('id'));
+    }
     
     /** @test */
     public function a_user_can_update_project(){
@@ -58,7 +66,6 @@ class ManageProjectsTests extends TestCase
     }
 
     /** @test **/
-    
     public function a_user_can_update_project_notes() {
         $this->withoutExceptionHandling(); 
         $project = ProjectFactory::create();
@@ -67,13 +74,28 @@ class ManageProjectsTests extends TestCase
 
         $this->assertDatabaseHas('projects',$attributes);
     }
-    
 
      /** @test **/
      public function an_authenticated_user_cannot_update_projects_of_other() {
         $this->signIn();
         $project = factory('App\Project')->create();
         $this->patch($project->path())->assertStatus(403);
+    }
+
+    /** @test **/
+    
+    public function an_authenticated_user_can_only_see_there_projects_or_projectes_inveted_to_by_others() {
+        $project = tap(ProjectFactory::create())->invite($this->signIn());
+        $this->get('/projects')->assertSee($project->title);
+    }
+    
+
+    /** @test **/
+     public function an_authenticated_user_cannot_delete_projects_of_other() {
+        $project = factory('App\Project')->create();
+        $this->delete($project->path())->assertRedirect('/login');
+        $this->signIn();
+        $this->delete($project->path())->assertStatus(403);
     }
 
     /** @test */

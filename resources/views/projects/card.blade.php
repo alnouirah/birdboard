@@ -5,9 +5,14 @@
     
     </h3>
 
-    <div style="color: rgb(0,0,0,0.4)">
-    
+    <div style="color: rgb(0,0,0,0.4)" class="mb-4">
         {{ str_limit($project->description ,100) }}
-    
     </div>
+    <footer>
+        <form action="{{ $project->path() }}" method="POST" class="text-right">
+            @method('DELETE')
+            @csrf
+            <button type="submit" class="text-xs">Delete</button>
+        </form>
+    </footer>
 </div>

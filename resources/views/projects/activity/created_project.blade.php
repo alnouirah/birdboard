@@ -1,0 +1,1 @@
+{{ $activity->project->title }} created.

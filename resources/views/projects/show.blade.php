@@ -1,5 +1,3 @@
-
-
 @extends('layouts.app')
 @section('content')
 
@@ -7,11 +5,18 @@
 
                 <div class="flex items-end justify-between w-full">
 
-                <p style="color: rgba(0, 0, 0, 0.4)">
-                        <a href="/projects">Projects</a> / {{ $project->title }}
-                </p>
+                
+                        <p style="color: rgba(0, 0, 0, 0.4)">
+                                <a href="/projects">Projects</a> / {{ $project->title }}
+                        </p>
 
-                <a href="{{ $project->path().'/edit' }}" style="padding: 5px;border-radius:4px;color:#fff;background:#2da6ce">Edit Project</a>
+                        <div class="flex item-center">
+                                @foreach ($project->members as $member)
+                                        <img src="{{ gravatar_url($member->email) }}" alt="{{ $member->name }} - Gravatar" class="rounded-full w-8 mr-2"/>
+                                        @endforeach
+                                        <img src="{{ gravatar_url($project->owner->email) }}" alt="{{ $project->owner->name }} - Gravatar" class="rounded-full w-8 mr-2" />
+                                <a href="{{ $project->path().'/edit' }}" style="padding: 5px;border-radius:4px;color:#fff;background:#2da6ce">Edit Project</a>
+                        </div>
                 </div>
         </header>
 
@@ -33,7 +38,7 @@
                                                                 <div class="flex">
 
                                                                         <input class="w-full" type="text" name="body" value="{{ $task->body }}"/> 
-                                                                        <input onchange="this.form.submit()" type="checkbox" name="compleated" {{ $task->compleated ? "checked":"" }} />
+                                                                        <input onchange="this.form.submit()" type="checkbox" name="completed" {{ $task->completed ? "checked":"" }} />
                                                                 </div>
                                                         </form>
                                                 
@@ -68,22 +73,22 @@
                                                 <input type="submit" class="btn" value="Save">
 
                                                 @if ($errors->any())
-          
-                                                <div class="field mt-6">
-                                                        @foreach ($errors->all() as $error)
-                                                                <li class="text-small text-red" style="color: red">{{ $error }}</li>
-                                                        @endforeach
-                                                </div>
-                                        @endif
+                
+                                                        <div class="field mt-6">
+                                                                @foreach ($errors->all() as $error)
+                                                                        <li class="text-small text-red" style="color: red">{{ $error }}</li>
+                                                                @endforeach
+                                                        </div>
+                                                @endif
 
                                         </form>
                                 </div>
                         </div>
                         
-                        <div class="lg:w-1/4 px-3">
-
+                        <div class="lg:w-1/4 px-3 lg:py-8">
                                 @include('projects.card')
-
+                                @include('projects.activity.card')
+                             
                         </div>
                 </div>
         </main>
